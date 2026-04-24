@@ -1,1 +1,1 @@
-{"version":3,"file":"install.d.ts","sourceRoot":"","sources":["../../../../src/cli/commands/install.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAKpC,wBAAgB,sBAAsB,CAAC,OAAO,EAAE,OAAO,GAAG,IAAI,CAiC7D"}
+{"version":3,"file":"install.d.ts","sourceRoot":"","sources":["../../../../src/cli/commands/install.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAMpC,wBAAgB,sBAAsB,CAAC,OAAO,EAAE,OAAO,GAAG,IAAI,CA4C7D"}
