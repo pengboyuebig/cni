@@ -1,0 +1,39 @@
+{
+  "name": "cni",
+  "version": "1.0.0",
+  "description": "Cached npm install - symlink-based package cache manager",
+  "bin": {
+    "cni": "./dist/bin/cni.js"
+  },
+  "author": "boyue",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "cosmiconfig": "^9.0.0",
+    "fs-extra": "^11.2.0",
+    "pacote": "^18.0.0",
+    "semver": "^7.6.0",
+    "ssri": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.0",
+    "@types/node": "^20.0.0",
+    "@types/pacote": "^11.1.8",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "dist"
+  ]
+}
