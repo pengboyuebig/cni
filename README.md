@@ -1,115 +1,115 @@
 # CNI - Cached npm Install
 
-基于 symlink 的 npm 包缓存管理工具，实现跨项目依赖复用，节省下载时间和磁盘空间。
+A symlink-based npm package cache manager that enables cross-project dependency reuse, saving download time and disk space.
 
-## 特性
+## Features
 
-- **缓存复用** — 同版本包只下载一次，跨项目共享
-- **版本共存** — `lodash@4.17.21` 和 `lodash@4.17.20` 在缓存中共存
-- **符号链接** — Windows 使用 junction（免管理员权限），POSIX 使用 symlink
-- **npm Hook** — 可自动拦截 `npm install`，无需改变使用习惯
-- **多层级配置** — 全局配置 + 项目配置 + 环境变量 + CLI 参数
+- **Cache Reuse** — Download each package version once, share across projects
+- **Version Coexistence** — `lodash@4.17.21` and `lodash@4.17.20` coexist in the cache
+- **Symbolic Links** — Uses junctions on Windows (no admin required), symlinks on POSIX
+- **npm Hook** — Optionally intercepts `npm install` with no workflow changes
+- **Layered Config** — Global config + project config + environment variables + CLI flags
 
-## 安装
+## Installation
 
 ```bash
-cd D:\work\project\brfore_2026\node
+cd /path/to/cni
 npm install
 npm run build
 npm link
 ```
 
-注册后即可在任意目录使用 `cni` 命令。
+Once linked, the `cni` command is available anywhere.
 
-## 快速开始
+## Quick Start
 
 ```bash
-# 进入任意项目目录
+# Go to any project directory
 cd your-project
 
-# 用 cni 替代 npm install
+# Use cni instead of npm install
 cni install
 
-# 添加新依赖
+# Add new dependencies
 cni add dayjs
 cni add jest -D
 ```
 
-首次运行会下载包到缓存目录，二次运行直接从缓存链接，跳过下载。
+The first run downloads packages to the cache directory. Subsequent runs link directly from cache, skipping the download.
 
-## 命令一览
+## Command Reference
 
-### install - 安装依赖
-
-```bash
-cni install                  # 安装 package.json 中所有依赖
-cni install lodash axios     # 安装指定包
-cni i                        # 简写
-cni install --production     # 仅安装 dependencies
-cni install --ignore-scripts # 跳过 lifecycle 脚本
-cni install --no-links       # 仅下载，不创建链接
-cni install --force          # 强制重新下载
-cni install --verbose        # 详细输出
-```
-
-### add - 添加依赖
+### install - Install dependencies
 
 ```bash
-cni add dayjs                # 添加到 dependencies
-cni add jest -D              # 添加到 devDependencies
-cni add lodash@4.17.21       # 指定版本
+cni install                  # Install all dependencies from package.json
+cni install lodash axios     # Install specific packages
+cni i                        # Shorthand
+cni install --production     # Install only dependencies
+cni install --ignore-scripts # Skip lifecycle scripts
+cni install --no-links       # Download only, don't create links
+cni install --force          # Force re-download
+cni install --verbose        # Verbose output
 ```
 
-### cache - 缓存管理
+### add - Add dependencies
 
 ```bash
-cni cache stat               # 查看缓存统计
-cni cache ls                 # 列出所有缓存包
-cni cache ls lodash          # 按模式搜索
-cni cache clean              # 清理无引用的包
-cni cache clean --all        # 清空全部缓存
-cni cache clean lodash       # 按模式删除
-cni cache verify             # 校验所有缓存包完整性
+cni add dayjs                # Add to dependencies
+cni add jest -D              # Add to devDependencies
+cni add lodash@4.17.21       # Specify version
 ```
 
-### config - 配置管理
+### cache - Cache management
 
 ```bash
-cni config list              # 查看所有配置
-cni config get store         # 查看某个配置值
-cni config set store "D:\.cni-store"   # 设置缓存路径
-cni config set registry "https://registry.npmmirror.com"  # 设置镜像源
+cni cache stat               # Show cache statistics
+cni cache ls                 # List all cached packages
+cni cache ls lodash          # Search by pattern
+cni cache clean              # Remove unreferenced packages
+cni cache clean --all        # Clear entire cache
+cni cache clean lodash       # Remove by pattern
+cni cache verify             # Verify integrity of all cached packages
 ```
 
-### hook - npm 拦截
+### config - Configuration management
 
 ```bash
-cni hook install             # 安装 preinstall hook
-cni hook uninstall           # 卸载 hook
+cni config list              # Show all configuration
+cni config get store         # Get a specific config value
+cni config set store "D:\.cni-store"   # Set cache path
+cni config set registry "https://registry.npmmirror.com"  # Set registry mirror
 ```
 
-安装 hook 后，每次 `npm install` 时 cni 会先从缓存安装包，npm 发现已存在则跳过下载。
+### hook - npm interception
 
-## 配置
-
-### 配置优先级
-
-```
-CLI 参数  >  环境变量  >  项目配置  >  全局配置  >  默认值
+```bash
+cni hook install             # Install preinstall hook
+cni hook uninstall           # Uninstall hook
 ```
 
-### 全局配置
+With the hook installed, every `npm install` will first install packages from cache via cni. npm then detects they already exist and skips downloading.
 
-路径：`~/.cni/config.json`（Windows: `C:\Users\<用户名>\.cni\config.json`）
+## Configuration
+
+### Priority
+
+```
+CLI flags  >  Environment variables  >  Project config  >  Global config  >  Defaults
+```
+
+### Global config
+
+Path: `~/.cni/config.json` (Windows: `C:\Users\<username>\.cni\config.json`)
 
 ```bash
 cni config set store "D:\work\.cni-store"
 cni config set registry "https://registry.npmmirror.com"
 ```
 
-### 项目配置
+### Project config
 
-在项目根目录创建 `.cnirc.json`：
+Create `.cnirc.json` in the project root:
 
 ```json
 {
@@ -118,7 +118,7 @@ cni config set registry "https://registry.npmmirror.com"
 }
 ```
 
-也支持在 `package.json` 中配置：
+Also supported inside `package.json`:
 
 ```json
 {
@@ -128,116 +128,120 @@ cni config set registry "https://registry.npmmirror.com"
 }
 ```
 
-### 环境变量
+### Environment variables
 
-| 变量 | 说明 |
-|------|------|
-| `CNI_STORE` | 缓存存储路径 |
-| `CNI_REGISTRY` | npm registry 地址 |
+| Variable | Description |
+|----------|-------------|
+| `CNI_STORE` | Cache storage path |
+| `CNI_REGISTRY` | npm registry URL |
 | `CNI_PROXY` | HTTP proxy |
 | `CNI_HTTPS_PROXY` | HTTPS proxy |
 
-### 配置项说明
+### Config options
 
-| 字段 | 默认值 | 说明 |
-|------|--------|------|
-| `store` | `~/.cni/store` | 缓存存储根路径 |
-| `registry` | `https://registry.npmjs.org` | npm registry 地址 |
-| `linkType` | Windows: `junction` / POSIX: `symlink` | 链接类型 |
-| `verifyIntegrity` | `true` | 是否校验缓存完整性 |
-| `concurrency` | `4` | 并发下载数 |
-| `runScripts` | `true` | 是否运行 lifecycle 脚本 |
-| `maxStoreSize` | `0` | 最大缓存大小，0 = 无限 |
+| Field | Default | Description |
+|-------|---------|-------------|
+| `store` | `~/.cni/store` | Cache storage root path |
+| `registry` | `https://registry.npmjs.org` | npm registry URL |
+| `linkType` | Windows: `junction` / POSIX: `symlink` | Link type |
+| `verifyIntegrity` | `true` | Verify cache integrity |
+| `concurrency` | `4` | Concurrent downloads |
+| `runScripts` | `true` | Run lifecycle scripts |
+| `maxStoreSize` | `0` | Max cache size, 0 = unlimited |
 
-## 缓存存储结构
+## Cache Storage Structure
 
 ```
 <store>/
-├── _metadata.json                # 全局统计
+├── _metadata.json                # Global statistics
 ├── lodash/
 │   ├── 4.17.21/
 │   │   ├── node_modules/
-│   │   │   └── lodash/           # 包内容
-│   │   └── .metadata.json        # 版本元数据
-│   └── 4.17.20/                  # 不同版本共存
+│   │   │   └── lodash/           # Package contents
+│   │   └── .metadata.json        # Version metadata
+│   └── 4.17.20/                  # Different versions coexist
 │       └── ...
 ├── @babel/
 │   └── core/
-│       └── 7.24.0/               # scope 包
+│       └── 7.24.0/               # Scoped packages
 │           └── ...
 ```
 
-## 工作原理
+## How It Works
 
 ```
 cni install
     │
     ▼
-1. 加载配置 ← 全局 + 项目 + 环境变量 + CLI
+1. Load config ← Global + Project + Environment + CLI
     │
     ▼
-2. 解析依赖 ← 读取 package-lock.json 获取精确版本
+2. Resolve dependencies ← Read package-lock.json for exact versions
     │
     ▼
-3. 缓存检查 ← 命中则跳过下载，未命中则标记需下载
+3. Check cache ← Hit: skip download; Miss: mark for download
     │
     ▼
-4. 下载缺失 ← pacote 下载到缓存，自动校验 integrity
+4. Download missing ← pacote downloads to cache, auto-verify integrity
     │
     ▼
-5. 创建链接 ← junction/symlink 链接到 node_modules
+5. Create links ← junction/symlink into node_modules
     │
     ▼
-6. 完成安装 ← 更新引用，输出摘要
+6. Complete ← Update references, print summary
 ```
 
-## 典型使用场景
+## Typical Use Cases
 
-### 多项目共享缓存
+### Multi-project cache sharing
 
 ```
-brfore_2026/
-├── .cni-store/          ← 共享缓存目录
-├── lca_main/            ← cni install → 从缓存链接
-├── glkj-carbon-frontend/ ← cni install → 复用已有缓存
-└── anhui-org-carbon-ui/  ← cni install → 复用已有缓存
+workspace/
+├── .cni-store/          ← Shared cache directory
+├── project-a/           ← cni install → link from cache
+├── project-b/           ← cni install → reuse existing cache
+└── project-c/           ← cni install → reuse existing cache
 ```
 
-在各项目中创建 `.cnirc.json`：
+Create `.cnirc.json` in each project:
 ```json
 { "store": "../.cni-store" }
 ```
 
-### npm Hook 模式
+### npm Hook mode
 
 ```bash
-# 一次性设置
+# One-time setup
 cni hook install
 
-# 之后正常使用 npm install.cni 自动在后台加速
+# Then use npm install as usual — cni accelerates in the background
 npm install
 ```
 
-### 自定义镜像源
+### Custom registry mirror
 
 ```bash
-# 针对国内网络
+# For networks with limited access to the default registry
 cni config set registry "https://registry.npmmirror.com"
 
-# 或在项目中配置
+# Or configure per project
 echo '{"registry":"https://registry.npmmirror.com"}' > .cnirc.json
 ```
 
-## Windows 注意事项
+## Windows Notes
 
-- 使用 `junction`（目录联接）替代 symlink，**不需要管理员权限**
-- junction 必须使用绝对路径
-- 如果 junction 创建失败，自动回退到硬拷贝
+- Uses `junction` (directory junctions) instead of symlinks — **no admin privileges required**
+- Junctions must use absolute paths
+- Automatically falls back to hard copy if junction creation fails
 
-## 开发
+## Development
 
 ```bash
-npm run build        # 编译 TypeScript
-npm run dev          # 监听模式编译
-node dist/bin/cni.js --help   # 直接运行
+npm run build        # Compile TypeScript
+npm run dev          # Watch mode compilation
+node dist/bin/cni.js --help   # Run directly
 ```
+
+## License
+
+MIT
