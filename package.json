@@ -1,6 +1,6 @@
 {
   "name": "cni",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Cached npm install - symlink-based package cache manager",
   "bin": {
     "cni": "./dist/bin/cni.js"
